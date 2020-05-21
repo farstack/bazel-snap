@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+JAVA_HOME=$(find $SNAP -iname javac  2>/dev/null| sed 's/\/bin\/javac//')
+export JAVA_HOME
+
+exec "$@"
+
