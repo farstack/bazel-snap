@@ -1,0 +1,11 @@
+--- ./parts/bazel/build/src/main/java/com/google/devtools/build/lib/syntax/BUILD        2020-05-21 20:33:27.989151799 +0000
++++ hi  2020-05-21 23:44:33.422899606 +0000
+@@ -169,7 +169,7 @@
+         "//src/conditions:freebsd": ["@bazel_tools//tools/jdk:jni_md_header-freebsd"],
+         "//src/conditions:openbsd": ["@bazel_tools//tools/jdk:jni_md_header-openbsd"],
+         "//src/conditions:windows": ["@bazel_tools//tools/jdk:jni_md_header-windows"],
+-        "//conditions:default": [],
++        "//conditions:default": ["@bazel_tools//tools/jdk:jni_md_header-linux"],
+     }),
+     includes = ["../../../../../../../../../external/bazel_tools/tools/jdk/include"] + select({
+         "//src/conditions:linux_x86_64": ["../../../../../../../../../external/bazel_tools/tools/jdk/include/linux"],
