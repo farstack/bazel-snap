@@ -18,7 +18,7 @@ confinement: strict
 apps:
   bazel:
     command: bin/get_envs $SNAP/bin/bazel
-    plugs: [network-bind, network]
+    plugs: [network-bind, network, home]
 
 parts:
   bazel:
@@ -33,7 +33,12 @@ parts:
       - zip
       - unzip
       - openjdk-11-jdk
-    stage-packages: [openjdk-11-jdk]
+    stage-packages:
+      - build-essential
+      #- python
+      #- zip
+      #- unzip
+      - openjdk-11-jdk
     override-build: |
       patch src/main/java/com/google/devtools/build/lib/syntax/BUILD < $SNAPCRAFT_STAGE/patches/BUILD_jni_md 
       patch scripts/bootstrap/compile.sh < $SNAPCRAFT_STAGE/patches/compile 
