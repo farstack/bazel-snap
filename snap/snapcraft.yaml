@@ -35,8 +35,8 @@ parts:
       - openjdk-11-jdk
     stage-packages: [openjdk-11-jdk]
     override-build: |
-    patch src/main/java/com/google/devtools/build/lib/syntax/BUILD < $SNAPCRAFT_STAGE/patches/BUILD_jni_md 
-    patch scripts/bootstrap/compile.sh < $SNAPCRAFT_STAGE/patches/compile 
+      patch src/main/java/com/google/devtools/build/lib/syntax/BUILD < $SNAPCRAFT_STAGE/patches/BUILD_jni_md 
+      patch scripts/bootstrap/compile.sh < $SNAPCRAFT_STAGE/patches/compile 
 
       env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
       mkdir -p $SNAPCRAFT_PART_INSTALL/bin
