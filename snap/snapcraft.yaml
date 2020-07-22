@@ -1,6 +1,6 @@
-name: bazel
+name: bazel-farstack
 base: core18
-version: '3.0.0'
+version: '3.1.0'
 summary: Bazel - a fast, scalable, multi-language and extensible build system 
 description: |
     {Fast, Correct} - Choose two
@@ -14,14 +14,19 @@ description: |
 
 grade: devel 
 confinement: strict
+architectures: [arm64, arm64]
 
 apps:
   bazel:
-    command: bin/get_envs $SNAP/bin/bazel
-    plugs: [network-bind, network, home]
+    command: bazel
+    plugs: [home]
 
 parts:
-  bazel:
+  scripts:
+    plugin: dump
+    source: scripts
+
+  bazel-bootstrap:
     after: [scripts]
     plugin: nil
     #source: https://github.com/bazelbuild/bazel
@@ -33,20 +38,40 @@ parts:
       - zip
       - unzip
       - openjdk-11-jdk
-    stage-packages:
-      - build-essential
-      #- python
-      #- zip
-      #- unzip
-      - openjdk-11-jdk
     override-build: |
       patch src/main/java/com/google/devtools/build/lib/syntax/BUILD < $SNAPCRAFT_STAGE/patches/BUILD_jni_md 
       patch scripts/bootstrap/compile.sh < $SNAPCRAFT_STAGE/patches/compile 
 
       env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
       mkdir -p $SNAPCRAFT_PART_INSTALL/bin
-      cp output/bazel $SNAPCRAFT_PART_INSTALL/bin
+      cp output/bazel $SNAPCRAFT_PART_INSTALL/bazel-bootstrap
     
-  scripts:
-    plugin: dump
-    source: scripts
+  bazel:
+    after: [bazel-bootstrap]
+    plugin: nil
+    source: https://github.com/bazelbuild/bazel.git
+    source-tag: '3.1.0'
+    build-packages:
+      - build-essential
+      - python
+      - zip
+      - unzip
+      - openjdk-11-jdk
+      - libc6-dev
+      - gcc
+      - libgcc-7-dev
+      - python3-dev
+      - dh-python
+      - libc-dev-bin
+      - libexpat1-dev
+      - libpython3-dev
+      - linux-libc-dev
+    override-build: |
+      patch src/main/java/com/google/devtools/build/lib/syntax/BUILD < $SNAPCRAFT_STAGE/patches/BUILD_jni_md 
+ 
+      export PATH=$PATH:$SNAPCRAFT_STAGE/bin
+      $SNAPCRAFT_STAGE/bazel-bootstrap build --local_ram_resources=2048  --jobs 3 --compilation_mode=opt --host_javabase=@local_jdk//:jdk //src:bazel  
+      cp bazel-bin/src/bazel $SNAPCRAFT_PART_INSTALL
+    prime:
+      - -bazel-bootstrap
+
